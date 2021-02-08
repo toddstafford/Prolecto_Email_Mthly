@@ -10,6 +10,7 @@ Module Program
         DoDaily()
         DoTeam()
         DoCPH()
+        DoTeamHistory()
     End Sub
 
     Sub DoDaily()
@@ -30,10 +31,8 @@ Module Program
         Dim FILE_NAME As String
         Dim CsvFile As New StringBuilder
 
-
         FILE_NAME = "\\garnet\ProlectoSends\FINKS_DAILY_SALES_DETAIL" & ".csv"
 
-        'FILE_NAME = "C:\Users\Tstafford\Documents\YURMAN_FINKS_" & SaturdayDate.ToString("yyyyMMdd") & ".csv"
         Dim objWriter As New System.IO.StreamWriter(FILE_NAME)
         Try
 
@@ -76,7 +75,7 @@ Module Program
 
             If Not objWriter Is Nothing Then objWriter.Close()
             Dim DAILYreport As New Attachment(FILE_NAME.ToString)
-            SendMail(DAILYreport, (Now()))
+            SendMail(DAILYreport, (Now()), "DailyDetail")
         End Try
     End Sub
     Sub DoTeam()
@@ -140,7 +139,7 @@ Module Program
 
             If Not objWriter Is Nothing Then objWriter.Close()
             Dim TEAMreport As New Attachment(FILE_NAME.ToString)
-            SendMail(TEAMreport, (Now()))
+            SendMail(TEAMreport, (Now()), "DailyTeam")
 
         End Try
     End Sub
@@ -205,12 +204,76 @@ Module Program
 
             If Not objWriter Is Nothing Then objWriter.Close()
             Dim CPHreport As New Attachment(FILE_NAME.ToString)
-            SendMail(CPHreport, (Now()))
+            SendMail(CPHreport, (Now()), "CPH")
 
         End Try
     End Sub
+    Sub DoTeamHistory()
+        Dim Conn As SqlConnection = New SqlConnection(dcFINKSRPT)
+        Dim CMD As SqlCommand = New SqlCommand("Prolecto_TEAM_HISTORY_Feed", Conn)
+        CMD.CommandType = Data.CommandType.StoredProcedure
 
-    Private Sub SendMail(ByVal fname As Attachment, rundate As Date)
+        Conn.Open()
+
+        Dim myReader As SqlDataReader = CMD.ExecuteReader()
+        Dim dt As New Data.DataTable
+        dt.Load(myReader)
+
+
+        myReader.Close()
+
+        Dim FILE_NAME As String
+        Dim CsvFile As New StringBuilder
+
+
+        FILE_NAME = "\\garnet\ProlectoSends\FINKS_TEAM_HISTORY" & ".csv"
+        Dim objWriter As New System.IO.StreamWriter(FILE_NAME)
+        Try
+
+            ' first write a line with the columns name
+
+            Dim sep As String = ""
+
+            Dim builder As New System.Text.StringBuilder
+
+            For Each col As Data.DataColumn In dt.Columns
+
+                builder.Append(sep).Append(col.ColumnName)
+
+                sep = ","
+            Next
+
+            objWriter.WriteLine(builder.ToString())
+
+            ' then write all the rows
+
+            For Each row As Data.DataRow In dt.Rows
+
+                sep = ""
+
+                builder = New System.Text.StringBuilder
+
+                For Each col As Data.DataColumn In dt.Columns
+
+                    builder.Append(sep).Append(row(col.ColumnName))
+
+                    sep = ","
+
+                Next
+
+                objWriter.WriteLine(builder.ToString())
+
+            Next
+
+        Finally
+
+            If Not objWriter Is Nothing Then objWriter.Close()
+            Dim TeamHistoryreport As New Attachment(FILE_NAME.ToString)
+            SendMail(TeamHistoryreport, (Now()), "TeamHistory")
+
+        End Try
+    End Sub
+    Private Sub SendMail(ByVal fname As Attachment, rundate As Date, subj As String)
 
         Try
             Dim myfrom As New MailAddress("tstafford@finks.com") 'emails.5404883.873.81ce8c857b@5404883.email.netsuite.com
@@ -219,9 +282,11 @@ Module Program
             'Dim cc2 As New MailAddress("salesadmin@rusa.com")
             Dim cc2 As New MailAddress("tstafford@finks.com")
 
+
+
             Dim rolexMail As New MailMessage(myfrom, myto)
             With rolexMail
-                .Subject = "Prolecto -" & rundate
+                .Subject = "Prolecto -" & rundate & " " & subj
                 .Body = "Fink's Jewelers"
                 .Attachments.Add(fname)
                 .To.Add(cc2)
