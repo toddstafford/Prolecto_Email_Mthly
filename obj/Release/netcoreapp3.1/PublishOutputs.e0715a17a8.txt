@@ -1,0 +1,11 @@
+\\garnet\ProlectoSends\Prolecto_Email.exe
+\\garnet\ProlectoSends\Prolecto_Email.dll
+\\garnet\ProlectoSends\Prolecto_Email.deps.json
+\\garnet\ProlectoSends\Prolecto_Email.runtimeconfig.json
+\\garnet\ProlectoSends\Prolecto_Email.pdb
+\\garnet\ProlectoSends\System.Data.SqlClient.dll
+\\garnet\ProlectoSends\runtimes\win-arm64\native\sni.dll
+\\garnet\ProlectoSends\runtimes\win-x64\native\sni.dll
+\\garnet\ProlectoSends\runtimes\win-x86\native\sni.dll
+\\garnet\ProlectoSends\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+\\garnet\ProlectoSends\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
